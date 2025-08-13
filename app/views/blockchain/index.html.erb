@@ -1,0 +1,50 @@
+<%# app/views/blockchain/index.html.erb %>
+
+<style>
+  body { font-family: sans-serif; margin: 2em; }
+  h1, h2 { color: #333; }
+  table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+  th, td { border: 1px solid #ddd; padding: 8px; text-align: left; word-break: break-all; }
+  th { background-color: #f2f2f2; }
+  .form-container { margin-top: 30px; padding: 20px; border: 1px solid #ccc; border-radius: 5px; }
+  input[type="text"] { width: 300px; padding: 8px; }
+  input[type="submit"] { padding: 10px 15px; background-color: #28a745; color: white; border: none; cursor: pointer; }
+</style>
+
+<h1>Minha Blockchain em Rails</h1>
+
+<div class="form-container">
+  <h2>Adicionar Novo Bloco</h2>
+  <%= form_with url: add_block_path, method: :post do |form| %>
+    <%= form.label :data, "Dados para o Bloco:" %>
+    <%= form.text_field :data, required: true %>
+    <%= form.submit "Minerar e Adicionar Bloco" %>
+  <% end %>
+</div>
+
+<h2>Cadeia de Blocos Atual</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Índice</th>
+      <th>Timestamp</th>
+      <th>Dados</th>
+      <th>Nonce</th>
+      <th>Hash Anterior</th>
+      <th>Hash</th>
+    </tr>
+  </thead>
+  <tbody>
+    <%# O .reverse é para mostrar o bloco mais recente no topo %>
+    <% @chain.reverse.each do |block| %>
+      <tr>
+        <td><%= block.index %></td>
+        <td><%= block.timestamp %></td>
+        <td><%= block.data %></td>
+        <td><%= block.nonce %></td>
+        <td><%= block.previous_hash %></td>
+        <td><%= block.hash %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
