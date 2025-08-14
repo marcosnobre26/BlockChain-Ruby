@@ -2,8 +2,7 @@
 
 one:
   index: 0
-  # Esta linha deve ter uma data/hora estática, sem ERB (<%= ... %>)
-  timestamp: "2025-08-14 10:00:00" 
+  timestamp: "2025-08-14 10:00:00"
   data: "Bloco Gênesis de Teste"
   previous_hash: "0"
   block_hash: "00a1b2c3d4e5f6"
