@@ -1,7 +1,6 @@
-require 'digest'
+require "digest"
 
 class Block
-
   attr_reader :index, :timestamp, :data, :previous_hash, :hash, :nonce
 
   def initialize(index:, data:, previous_hash:)
@@ -14,8 +13,7 @@ class Block
   end
 
   def mine(difficulty)
-    
-    prefix = '0' * difficulty
+    prefix = "0" * difficulty
 
     until @hash.start_with?(prefix)
       @nonce += 1
@@ -27,7 +25,7 @@ class Block
 
   def calculate_hash
     payload = @index.to_s + @timestamp.to_s + @data.to_s + @previous_hash.to_s + @nonce.to_s
-    
+
     Digest::SHA256.hexdigest(payload)
   end
 end

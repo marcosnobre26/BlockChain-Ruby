@@ -3,7 +3,7 @@ class ChainValidator
 
   def self.call
     blocks = Block.order(index: :asc)
-    
+
     blocks.each_with_index do |block, current_index|
       if current_index == 0
         unless genesis_block_valid?(block)
@@ -27,7 +27,7 @@ class ChainValidator
     end
 
     puts "SUCESSO: A cadeia de blocos foi verificada e é válida."
-    return true
+    true
   end
 
   private

@@ -1,4 +1,4 @@
-require_relative '../services/block_miner'
+require_relative "../services/block_miner"
 
 class BlockchainController < ApplicationController
   def index
@@ -6,7 +6,6 @@ class BlockchainController < ApplicationController
   end
 
   def validate_chain
-    
     is_valid = ChainValidator.call
 
     if is_valid
@@ -19,20 +18,20 @@ class BlockchainController < ApplicationController
   def create
     pending_transactions = LedgerTransaction.pending.to_a
 
-    
+
     if pending_transactions.empty? && Block.any?
-      redirect_to root_path, alert: 'Nenhuma transação pendente para minerar.'
+      redirect_to root_path, alert: "Nenhuma transação pendente para minerar."
       return
     end
 
-    
+
     new_block = BlockMiner.call(pending_transactions)
 
     if new_block
       redirect_to root_path, notice: "Bloco ##{new_block.index} minerado com sucesso!"
     else
-      
-      redirect_to root_path, alert: 'Ocorreu um erro ao minerar o bloco.'
+
+      redirect_to root_path, alert: "Ocorreu um erro ao minerar o bloco."
     end
   end
 end

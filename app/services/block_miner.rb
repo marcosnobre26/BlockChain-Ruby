@@ -12,17 +12,17 @@ class BlockMiner
       end
     end
     puts "#{verified_transactions.count} transações foram verificadas com sucesso."
-    
+
     if verified_transactions.empty? && Block.any?
       return nil
     end
-    
+
     last_block = Block.last
 
     if last_block.nil?
       index = 0
-      previous_hash = '0'
-      data_payload = 'Bloco Gênesis'
+      previous_hash = "0"
+      data_payload = "Bloco Gênesis"
     else
       index = last_block.index + 1
       previous_hash = last_block.block_hash
@@ -32,7 +32,7 @@ class BlockMiner
     nonce = 0
     timestamp = Time.now
     block_hash = ""
-    prefix = '0' * DIFFICULTY
+    prefix = "0" * DIFFICULTY
 
     loop do
       payload = "#{index}#{timestamp.to_i}#{data_payload}#{previous_hash}#{nonce}"
@@ -54,7 +54,7 @@ class BlockMiner
 
       verified_transactions.each { |tx| tx.update!(block: new_block) }
     end
-    
-    return new_block
+
+    new_block
   end
 end

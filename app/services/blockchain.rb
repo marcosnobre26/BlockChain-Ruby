@@ -1,11 +1,10 @@
-require_relative 'block'
+require_relative "block"
 
 class Blockchain
-
   attr_reader :chain, :difficulty
 
   def initialize(difficulty: 2)
-    @chain = [create_genesis_block]
+    @chain = [ create_genesis_block ]
     @difficulty = difficulty
   end
 
@@ -16,15 +15,15 @@ class Blockchain
       data: data,
       previous_hash: previous_block.hash
     )
-    
+
     new_block.mine(@difficulty)
-    
+
     @chain.push(new_block)
   end
 
   private
 
   def create_genesis_block
-    Block.new(index: 0, data: 'Bloco Gênesis', previous_hash: '0')
+    Block.new(index: 0, data: "Bloco Gênesis", previous_hash: "0")
   end
 end
