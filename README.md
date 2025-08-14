@@ -2,48 +2,71 @@
 
 ![Ruby On Rails](https://img.shields.io/badge/Ruby_on_Rails-CC0000?style=for-the-badge&logo=ruby-on-rails&logoColor=white)
 ![Ruby](https://img.shields.io/badge/Ruby-CC342D?style=for-the-badge&logo=ruby&logoColor=white)
-
-Este projeto é uma implementação educacional de uma blockchain simples, construída com Ruby on Rails. O objetivo é demonstrar a compreensão e a aplicação dos conceitos fundamentais por trás da tecnologia blockchain, como blocos, cadeias criptográficas e o mecanismo de consenso de Prova de Trabalho (Proof of Work).
-
-## Screenshot
-
-**![alt text](public/image.png)**
-
----
+![SQLite](https://img.shields.io/badge/SQLite-07405E?style=for-the-badge&logo=sqlite&logoColor=white)
 
 ## Sobre o Projeto
 
-A aplicação permite visualizar uma cadeia de blocos e adicionar novos blocos a ela. Cada novo bloco deve ser "minerado" antes de ser adicionado, resolvendo um desafio de Prova de Trabalho, o que torna a cadeia segura e imutável.
+Este projeto é uma implementação educacional de uma blockchain funcional, construída com Ruby on Rails. O objetivo é demonstrar na prática a arquitetura e os mecanismos de segurança por trás de sistemas de registro distribuído (DLT).
 
-### Principais Conceitos Implementados
+A aplicação vai além de uma simples simulação, incorporando um sistema de banco de dados persistente, autenticação de usuários, carteiras digitais com criptografia de chave pública/privada e validação de assinaturas, refletindo o funcionamento de criptomoedas reais.
 
-* **Bloco (`Block`):** A estrutura de dados fundamental, contendo um índice, timestamp, dados, o hash do bloco anterior e um *nonce*.
-* **Cadeia (`Blockchain`):** Uma lista encadeada de blocos, onde cada bloco está criptograficamente ligado ao anterior através de seu hash. A cadeia começa com um "Bloco Gênesis".
-* **Prova de Trabalho (`Proof of Work`):** Um mecanismo de consenso que exige trabalho computacional para adicionar um novo bloco. A dificuldade é definida por um número de zeros que o hash do bloco deve ter no início. O *Nonce* é incrementado até que um hash válido seja encontrado.
+## Screenshot
 
-A lógica principal da blockchain foi separada na pasta `app/services`, demonstrando uma organização de código que isola a lógica de negócio dos componentes MVC padrão do Rails.
+![Screenshot da Aplicação](public/image.png)
+
+*(Lembre-se de atualizar o screenshot para refletir a interface atual, com a tabela de blocos e os botões de ação!)*
+
+---
+
+## Fluxo de Funcionamento da Aplicação
+
+A aplicação simula um ecossistema de blockchain completo com o seguinte fluxo:
+
+1.  **Cadastro e Criação de Carteira:** Um novo usuário se cadastra usando o sistema de autenticação `Devise`. No momento da criação, um par de chaves criptográficas RSA de 2048 bits (pública e privada) é gerado usando a biblioteca `OpenSSL`. A chave pública serve como o "endereço" da carteira, enquanto a chave privada é armazenada para assinar futuras transações.
+
+2.  **Criação e Assinatura de Transações:** Um usuário logado pode criar uma nova transação. O remetente é sempre a carteira do usuário logado. A transação é então **assinada digitalmente** com a chave privada do usuário. Essa assinatura é a prova criptográfica de que o dono da carteira autorizou a transação.
+
+3.  **Mempool (Sala de Espera):** A transação assinada é salva no banco de dados com um `block_id` nulo, colocando-a em um "Mempool" de transações pendentes.
+
+4.  **Mineração e Validação:** Ao acionar a mineração, o `BlockMiner` (um Service Object dedicado) executa os seguintes passos:
+    * **Verificação de Assinaturas:** Ele busca todas as transações no Mempool e verifica a assinatura de cada uma usando a chave pública do remetente. Transações com assinaturas inválidas são descartadas.
+    * **Prova de Trabalho (Proof of Work):** Um novo bloco é criado com as transações válidas. O minerador então resolve um desafio computacional (encontrar um *nonce* que gere um hash com um número predefinido de zeros no início) para validar o bloco.
+    * **Adição à Cadeia:** O bloco minerado é salvo no banco de dados, e as transações contidas nele são atualizadas para referenciar o novo bloco, removendo-as do Mempool.
+
+5.  **Validação da Cadeia:** A qualquer momento, um usuário pode acionar o `ChainValidator`. Este serviço percorre toda a blockchain, do Bloco Gênesis ao mais recente, verificando a integridade de cada elo (`previous_hash`) e a validade da Prova de Trabalho de cada bloco.
+
+## Arquitetura e Boas Práticas
+
+* **Service Objects:** A lógica de negócio complexa (mineração e validação) foi isolada em Service Objects (`BlockMiner`, `ChainValidator`), mantendo os controllers "magros" e focados em gerenciar requisições HTTP.
+* **Helpers:** Lógica de formatação de dados para a view (como truncar as chaves públicas) foi encapsulada em helpers, seguindo as convenções do Rails.
+* **Segurança:** A autenticação é gerenciada pelo `Devise`. A segurança e autenticidade das transações são garantidas por assinaturas digitais RSA.
 
 ## Tecnologias Utilizadas
 
-* [Ruby](https://www.ruby-lang.org/)
-* [Ruby on Rails](https://rubyonrails.org/)
-* HTML / CSS Básico
+* **Backend:** Ruby on Rails, Puma
+* **Banco de Dados:** SQLite3
+* **Autenticação:** Devise
+* **Criptografia:** OpenSSL (biblioteca padrão do Ruby)
+* **Frontend:** HTML, CSS, ERB (Embedded Ruby)
 
-## Funcionalidades
+## Funcionalidades Implementadas
 
-* Visualização da cadeia de blocos em tempo real (em memória).
-* Interface web para adicionar novos dados à blockchain.
-* Mineração de novos blocos com um nível de dificuldade ajustável.
-* Validação implícita da cadeia através da ligação por hash.
+-   [x] **Persistência de Dados:** A blockchain é armazenada em um banco de dados SQLite.
+-   [x] **Sistema de Transações:** Implementação de um modelo `LedgerTransaction` para registros detalhados.
+-   [x] **Validação da Cadeia:** Um serviço dedicado verifica a integridade da blockchain.
+-   [x] **Autenticação de Usuários** com Devise.
+-   [x] **Carteiras Digitais** com geração de chaves pública/privada.
+-   [x] **Assinatura e Verificação** de transações com criptografia RSA.
+-   [x] **Prova de Trabalho (Proof of Work)** para mineração de blocos.
+-   [x] **Mempool** para transações pendentes.
+-   [x] **Interface Web** para interagir com a blockchain.
 
 ## Como Executar o Projeto Localmente
-
-Siga os passos abaixo para rodar a aplicação no seu ambiente de desenvolvimento.
 
 ### Pré-requisitos
 
 * Ruby (versão ~3.3.x)
-* Ruby on Rails (versão ~7.1.x)
+* Ruby on Rails (versão ~8.0.x)
 * Bundler
 * Node.js
 
@@ -51,40 +74,35 @@ Siga os passos abaixo para rodar a aplicação no seu ambiente de desenvolviment
 
 1.  **Clone o repositório:**
     ```bash
-    git clone [https://github.com/SEU-USUARIO/rails-chain.git](https://github.com/SEU-USUARIO/rails-chain.git)
+    git clone [https://github.com/marcosnobre26/BlockChain-Ruby.git](https://github.com/marcosnobre26/BlockChain-Ruby.git)
     ```
 
 2.  **Navegue até o diretório do projeto:**
     ```bash
-    cd rails-chain
+    cd BlockChain-Ruby
     ```
 
-3.  **Instale as dependências (gems):**
+3.  **Instale as dependências:**
     ```bash
     bundle install
     ```
 
-4.  **Inicie o servidor Rails:**
+4.  **Prepare o banco de dados:**
+    ```bash
+    rails db:reset
+    ```
+
+5.  **Inicie o servidor Rails:**
     ```bash
     rails server
     ```
 
-5.  **Acesse a aplicação:**
+6.  **Acesse a aplicação:**
     Abra seu navegador e visite `http://localhost:3000`.
-
-## Próximos Passos e Melhorias Futuras
-
-Este projeto é uma base sólida. As próximas melhorias para torná-lo uma aplicação mais robusta incluem:
-
--   [ ] **Persistência de Dados:** Salvar a blockchain em um banco de dados (como PostgreSQL) em vez de mantê-la apenas em memória.
--   [ ] **API Endpoints:** Criar uma API RESTful para que outras aplicações possam interagir com a blockchain (ver a cadeia, submeter transações).
--   [ ] **Sistema de Transações:** Implementar um modelo de "Transações" mais complexo em vez de apenas uma string de dados.
--   [ ] **Rede P2P:** Adicionar uma camada de rede para que múltiplas instâncias da aplicação possam se comunicar e sincronizar suas cadeias, simulando uma rede descentralizada.
--   [ ] **Validação da Cadeia:** Criar um método para percorrer a cadeia e validar se todos os hashes e provas de trabalho estão corretos.
 
 ## Autor
 
-**[Marcos Nobre Castro Silva]**
+**Marcos Nobre Castro Silva**
 
-* GitHub: `https://github.com/marcosnobre26`
-* LinkedIn: `https://linkedin.com/in/marcos-nobre-1363661a8`
+* **GitHub:** `https://github.com/marcosnobre26`
+* **LinkedIn:** `https://linkedin.com/in/marcos-nobre-1363661a8`

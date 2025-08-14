@@ -1,28 +1,42 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= content_for(:title) || "Rails Chain" %></title>
+    <title>RailsChain</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="mobile-web-app-capable" content="yes">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
-    <%= yield :head %>
-
-    <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
-    <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
-
-    <link rel="icon" href="/icon.png" type="image/png">
-    <link rel="icon" href="/icon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/icon.png">
-
-    <%# Includes all stylesheet files in app/assets/stylesheets %>
-    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
 
   <body>
+    <%# --- Bloco para exibir o status do usuário e as mensagens --- %>
+    <div style="background-color: #f8f9fa; padding: 10px; border-bottom: 1px solid #dee2e6; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <% if notice %>
+          <p style="color: green; margin: 0;"><%= notice %></p>
+        <% end %>
+        <% if alert %>
+          <p style="color: red; margin: 0;"><%= alert %></p>
+        <% end %>
+      </div>
+      <div>
+        <% if user_signed_in? %>
+          <span>Olá, <strong><%= current_user.email %></strong></span>
+          <%= link_to "Minha Carteira", my_wallet_path, style: 'margin-left: 15px;' %>
+          <%# O 'data-turbo-method' foi removido para consistência, o method: :delete já é suficiente com Rails 7+ %>
+          <%= button_to "Sair", destroy_user_session_path, method: :delete, style: 'margin-left: 15px; display: inline-block; vertical-align: middle;' %>
+        <% else %>
+          <%= link_to "Entrar", new_user_session_path, style: 'margin-left: 15px;' %>
+          <%= link_to "Cadastrar-se", new_user_registration_path, style: 'margin-left: 15px;' %>
+        <% end %>
+      </div>
+    </div>
+    <%# --- Fim do Bloco --- %>
+
+    <%# O conteúdo de cada página individual é renderizado aqui %>
     <%= yield %>
+    
   </body>
 </html>
