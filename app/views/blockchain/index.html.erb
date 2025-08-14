@@ -4,12 +4,12 @@
   body { font-family: sans-serif; margin: 2em; }
   h1, h2 { color: #333; }
   table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-  th, td { border: 1px solid #ddd; padding: 8px; text-align: left; word-break: break-all; }
+  th, td { border: 1px solid #ddd; padding: 8px; text-align: left; vertical-align: top; word-break: break-all; }
   th { background-color: #f2f2f2; }
-  .actions-container { margin-top: 30px; padding: 20px; border: 1px solid #ccc; border-radius: 5px; background-color: #f9f9f9; }
+  .actions-container { margin-top: 30px; margin-bottom: 30px; padding: 20px; border: 1px solid #ccc; border-radius: 5px; background-color: #f9f9f9; }
   .btn { display: inline-block; text-decoration: none; color: white; padding: 10px 15px; border-radius: 5px; margin-right: 15px; }
   .btn-create { background-color: #007bff; }
-  .btn-mine { background-color: #28a745; border: none; font-size: 1em; cursor: pointer; }
+  .btn-mine { background-color: #28a745; border: none; font-size: 1em; cursor: pointer; font-family: sans-serif; }
 </style>
 
 <h1>Minha Blockchain em Rails (com Banco de Dados)</h1>
@@ -19,11 +19,10 @@
   
   <%= link_to 'Criar Nova Transação', new_ledger_transaction_path, class: 'btn btn-create' %>
 
-  <%= form_with url: add_block_path, method: :post, data: { turbo: false } do |form| %>
+  <%= form_with url: add_block_path, method: :post, style: 'display: inline;', data: { turbo: false } do |form| %>
     <%= form.submit "Minerar Bloco com Transações Pendentes", class: 'btn btn-mine' %>
   <% end %>
 
-  <%# Adicione este novo link de validação %>
   <%= link_to 'Validar Cadeia', validate_chain_path, class: 'btn', style: 'background-color: #ffc107; color: black;' %>
 </div>
 
@@ -31,47 +30,39 @@
 <table>
   <thead>
     <tr>
-      <th>Índice</th>
-      <th>Timestamp</th>
+      <th style="width: 5%;">Índice</th>
+      <th style="width: 15%;">Timestamp</th>
       <th>Dados (Transações)</th>
-      <th>Nonce</th>
-      <th>Hash Anterior</th>
-      <th>Hash</th>
+      <th style="width: 5%;">Nonce</th>
+      <th style="width: 20%;">Hash Anterior</th>
+      <th style="width: 20%;">Hash</th>
     </tr>
   </thead>
-<tbody>
+  <tbody>
     <% if @blocks.any? %>
       <% @blocks.reverse.each do |block| %>
         <tr>
           <td><%= block.index %></td>
-          <td><%= block.timestamp %></td>
-
-          <%# CÉLULA DE DADOS CORRIGIDA %>
+          <td><%= block.timestamp.strftime("%d/%m/%Y %H:%M:%S") %></td>
+          
+          <%# Lógica corrigida para usar associações do Rails em vez de JSON.parse %>
           <td>
-            <% if block.data == 'Bloco Gênesis' %>
-              <%= block.data %>
-            <% else %>
-              <% begin %>
-                <% transactions = JSON.parse(block.data) %>
-                <% if transactions.any? %>
-                  <ul style="margin: 0; padding-left: 15px;">
-                    <% transactions.each do |tx| %>
-                      <li>
-                        <strong>De:</strong> <%= truncate_key(tx['sender']) %> | 
-                        <strong>Para:</strong> <%= truncate_key(tx['recipient']) %> | 
-                        <strong>Quantia:</strong> <%= tx['amount'] %>
-                      </li>
-                    <% end %>
-                  </ul>
-                <% else %>
-                  Nenhuma transação neste bloco.
+            <% if block.ledger_transactions.any? %>
+              <ul style="margin: 0; padding-left: 15px;">
+                <% block.ledger_transactions.each do |tx| %>
+                  <li>
+                    <strong>De:</strong> <%= truncate_key(tx.sender) %> | 
+                    <strong>Para:</strong> <%= truncate_key(tx.recipient) %> | 
+                    <strong>Quantia:</strong> <%= tx.amount %>
+                  </li>
                 <% end %>
-              <% rescue JSON::ParserError %>
-                Dados em formato inválido.
-              <% end %>
+              </ul>
+            <% else %>
+              <%# Se não houver transações associadas, exibe os dados brutos (para o Gênesis) %>
+              <%= block.data %>
             <% end %>
           </td>
-
+          
           <td><%= block.nonce %></td>
           <td><%= block.previous_hash %></td>
           <td><%= block.block_hash %></td>
@@ -79,7 +70,7 @@
       <% end %>
     <% else %>
       <tr>
-        <td colspan="6">Nenhum bloco foi minerado ainda.</td>
+        <td colspan="6" style="text-align: center;">Nenhum bloco foi minerado ainda.</td>
       </tr>
     <% end %>
   </tbody>
