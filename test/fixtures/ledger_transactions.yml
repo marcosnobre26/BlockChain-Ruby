@@ -1,13 +1,13 @@
-# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+# test/fixtures/ledger_transactions.yml
 
 one:
-  sender: MyString
-  recipient: MyString
-  amount: 9.99
-  block: one
+  sender: "carteira_teste_de"
+  recipient: "carteira_teste_para"
+  amount: 100
+  block: one # <- Esta linha agora aponta para o bloco 'one' que definimos acima.
 
 two:
-  sender: MyString
-  recipient: MyString
-  amount: 9.99
-  block: two
+  sender: "outra_carteira_de"
+  recipient: "outra_carteira_para"
+  amount: 50
+  block: one # <- Esta transação também pode pertencer ao mesmo bloco de teste.
