@@ -2,7 +2,8 @@
 
 one:
   index: 0
-  timestamp: <%= Time.now %>
+  # Correção: Usamos uma data/hora estática para garantir consistência nos testes.
+  timestamp: "2025-08-14 10:00:00"
   data: "Bloco Gênesis de Teste"
   previous_hash: "0"
   block_hash: "00a1b2c3d4e5f6" # Pode ser qualquer string para o teste
