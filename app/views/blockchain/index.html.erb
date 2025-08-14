@@ -43,7 +43,7 @@
       <% @blocks.reverse.each do |block| %>
         <tr>
           <td><%= block.index %></td>
-          <td><%= block.timestamp.strftime("%d/%m/%Y %H:%M:%S") %></td>
+          <td><%= block.timestamp&.strftime("%d/%m/%Y %H:%M:%S") %></td>
           
           <%# Lógica corrigida para usar associações do Rails em vez de JSON.parse %>
           <td>
